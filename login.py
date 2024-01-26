@@ -4,12 +4,20 @@ from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
+# Initialize Flask application
 app = Flask(__name__)
+
+# Configure SQLAlchemy database URI and track modifications
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sqlite.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Set a secret key for session management
 app.config['SECRET_KEY'] = 'SECRET_KEY'
+
+# Initialize SQLAlchemy database object
 db = SQLAlchemy(app)
 
+# Define User model
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -36,10 +44,16 @@ class User(db.Model):
         }
 
 # Add a route for a simple welcome page
-@app.route('/')
-def welcome():
-    return 'Welcome to the Flask App!'
+@app.route('/api/data', methods=['GET'])
+def get_data():
+    # Implement logic to fetch and return data
+    return jsonify({'data': 'Hello from the backend!'})
+@app.route('/api/data', methods=['POST'])
+def create_data():
+    # Implement logic to create a new resource
+    return jsonify({'message': 'Resource created successfully'})
 
+# Route to create a new user
 @app.route('/create_user', methods=['POST'])
 def create_user():
     data = request.get_json()
@@ -87,6 +101,7 @@ def check_credentials(uid, password):
             return False
         return user.check_password(password)
 
+# Run the Flask app
 if __name__ == '__main__':
     # Uncomment the line below for the first run to initialize users
     # init_users()
