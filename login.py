@@ -8,7 +8,7 @@ from datetime import datetime
 app = Flask(__name__)
 
 # Configure SQLAlchemy database URI and track modifications
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sqlite.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///login.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Set a secret key for session management
@@ -16,6 +16,10 @@ app.config['SECRET_KEY'] = 'SECRET_KEY'
 
 # Initialize SQLAlchemy database object
 db = SQLAlchemy(app)
+
+# Create the table if it doesn't already exist
+with app.app_context():
+    db.create_all()
 
 # Define User model
 class User(db.Model):
@@ -43,11 +47,14 @@ class User(db.Model):
             'dob': self.dob.strftime('%Y-%m-%d') if self.dob else None
         }
 
+
+
 # Add a route for a simple welcome page
 @app.route('/api/data', methods=['GET'])
 def get_data():
     # Implement logic to fetch and return data
     return jsonify({'data': 'Hello from the backend!'})
+
 @app.route('/api/data', methods=['POST'])
 def create_data():
     # Implement logic to create a new resource
@@ -74,13 +81,12 @@ def create_user():
 # Function to initialize users
 def init_users():
     with app.app_context():
-        db.create_all()
         u1 = User(name='Thomas Edison', uid='toby', password='123toby', dob=datetime(1847, 2, 11))
         u2 = User(name='Nikola Tesla', uid='niko', password='123niko')
         u3 = User(name='Alexander Graham Bell', uid='lex', password='123lex')
         u4 = User(name='Eli Whitney', uid='whit', password='123whit')
-        u5 = User(name='Indiana Jones', uid='indi', dob=datetime(1920, 10, 21))
-        u6 = User(name='Marion Ravenwood', uid='raven', dob=datetime(1921, 10, 21))
+        u5 = User(name='Indiana Jones', uid='indi', password= '123ind', dob=datetime(1920, 10, 21))
+        u6 = User(name='Marion Ravenwood', uid='raven', password= '123rav', dob=datetime(1921, 10, 21))
 
         users = [u1, u2, u3, u4, u5, u6]
 
@@ -104,5 +110,5 @@ def check_credentials(uid, password):
 # Run the Flask app
 if __name__ == '__main__':
     # Uncomment the line below for the first run to initialize users
-    # init_users()
+    init_users()
     app.run(debug=True)
